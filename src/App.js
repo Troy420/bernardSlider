@@ -17,7 +17,7 @@ export default class App extends React.Component {
           slideInterval="1000"
           autoplay={false}
           slideToShow="3"
-          infiniteMode={true}
+          infiniteMode={false}
           centerMode
         />
       </>

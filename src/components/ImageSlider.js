@@ -15,7 +15,8 @@ export default class ImageSlider extends React.Component {
   state = {
     slides: [],
     showLeft: true,
-    showRight: true
+    showRight: true,
+    isScrolling: false
   };
 
   slidePlayInterval = -1;
@@ -24,11 +25,8 @@ export default class ImageSlider extends React.Component {
   constructor(props) {
     super(props);
 
-    // console.log(this.state);
-
     // Allow user to inject different kind of props for initial state
     const { active, slides = [] } = props;
-    // const length = slides.length;
 
     // Mutate the slides to add our internal variables
     // Currently we only need active and index
@@ -59,6 +57,7 @@ export default class ImageSlider extends React.Component {
   componentDidUpdate() {
     this.scrollToActive();
     this.toggleButtons();
+    this.slideToShow();
   }
 
   slideToShow() {
@@ -131,17 +130,17 @@ export default class ImageSlider extends React.Component {
 
   toggleButtons = () => {
     const { getActive } = this;
-    const { slides, showLeft, showRight, infinite } = this.state;
+    const { infiniteMode } = this.props;
+    const { slides, showLeft, showRight } = this.state;
     const actives = getActive(slides);
     const first = actives.slice(0, 1).pop();
     const last = actives.slice(-1).pop();
     const newStates = {
       showLeft: true,
-      showRight: true,
-      infinite: true
+      showRight: true
     };
 
-    if (first && last && infinite === false) {
+    if (first && last && infiniteMode === false) {
       if (first.index === 0) {
         newStates.showLeft = false;
       }
@@ -278,7 +277,7 @@ export default class ImageSlider extends React.Component {
   };
 
   /**
-   * Calleer method to set current slide active
+   * Caller method to set current slide active
    *
    */
   currentSlide = (slide) => {
@@ -343,17 +342,11 @@ export default class ImageSlider extends React.Component {
     const active = getActive(slides);
     const odd = Number(slideToShow) % 2 !== 0;
 
-    // console.log("slideToShow", slideToShow);
-
-    // console.log("odd?", odd);
-
     if (odd) {
       centerMode = true;
     } else {
       centerMode = false;
     }
-
-    // console.log("centerMode", centerMode);
 
     // Change this to another index if we need scroll 3 elements at once
     // with 3 element scroll then get the middle [ index 1 ] as the
@@ -400,13 +393,12 @@ export default class ImageSlider extends React.Component {
     // Build the dotted image to jump to x slide and center them?
     return (
       <>
-        {showLeft && (
-          <button className="btn-arrow left-arrow" onClick={prevSlide}>
-            <FaAngleDoubleLeft />
-          </button>
-        )}
-
         <div className="slider">
+          {showLeft && (
+            <button className="btn-arrow left-arrow" onClick={prevSlide}>
+              <FaAngleDoubleLeft />
+            </button>
+          )}
           <div className="slide-wrapper" ref={this.sliderRef}>
             {slides.map((slide, index) => {
               return (
@@ -422,13 +414,12 @@ export default class ImageSlider extends React.Component {
               );
             })}
           </div>
+          {showRight && (
+            <button className="btn-arrow right-arrow" onClick={nextSlide}>
+              <FaAngleDoubleRight />
+            </button>
+          )}
         </div>
-
-        {showRight && (
-          <button className="btn-arrow right-arrow" onClick={nextSlide}>
-            <FaAngleDoubleRight />
-          </button>
-        )}
 
         <SliderDots
           key={JSON.stringify(
