@@ -1,8 +1,8 @@
 import React, { createRef } from "react";
 // import { FaSlidersH } from "react-icons/fa";
 import {
-  FaArrowAltCircleRight,
-  FaArrowAltCircleLeft,
+  FaAngleDoubleRight,
+  FaAngleDoubleLeft,
   FaPlay,
   FaSquare
 } from "react-icons/fa";
@@ -402,11 +402,11 @@ export default class ImageSlider extends React.Component {
       <>
         {showLeft && (
           <button className="btn-arrow left-arrow" onClick={prevSlide}>
-            <FaArrowAltCircleLeft />
+            <FaAngleDoubleLeft />
           </button>
         )}
 
-        <div className="slider snaps-inline">
+        <div className="slider">
           <div className="slide-wrapper" ref={this.sliderRef}>
             {slides.map((slide, index) => {
               return (
@@ -426,7 +426,7 @@ export default class ImageSlider extends React.Component {
 
         {showRight && (
           <button className="btn-arrow right-arrow" onClick={nextSlide}>
-            <FaArrowAltCircleRight />
+            <FaAngleDoubleRight />
           </button>
         )}
 
