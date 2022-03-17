@@ -12,11 +12,11 @@ export default class App extends React.Component {
     return (
       <>
         <ImageSlider
-          active="1"
+          active="2"
           slides={SliderData}
           slideInterval="1000"
           autoplay={false}
-          slideToShow="3"
+          slideToShow="2"
           infiniteMode={true}
           centerMode
         />

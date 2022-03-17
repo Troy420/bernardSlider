@@ -68,12 +68,12 @@
 .snaps-inline > * {
   scroll-snap-align: center;
 }
-.snaps-inline > *:first-child {
+/* .snaps-inline > *:first-child {
   scroll-snap-align: start;
 }
 .snaps-inline > *:last-child {
   scroll-snap-align: end;
-}
+} */
 .btn-arrow {
   --_spacer: var(--size-9);
   font-size: var(--_spacer);

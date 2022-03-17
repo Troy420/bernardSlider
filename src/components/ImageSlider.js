@@ -62,7 +62,7 @@ export default class ImageSlider extends React.Component {
   }
 
   slideToShow() {
-    // 100% / numberOfSlides + '%'
+    // 100 / numberOfSlides + '%'
 
     const { slideToShow } = this.props;
     const numberOfSlide = Number(slideToShow);
@@ -87,19 +87,6 @@ export default class ImageSlider extends React.Component {
       return slide.active;
     });
   }
-
-  /**
-   * Simple function for getting all the slides index
-   * This should be connected to how many slides to display?
-   * currently only single slides so it wont matter
-   *
-   * @param {*} slides
-   */
-  // getSlidesIndex = (slides) => {
-  //   return slides.filter((slide) => {
-  //     return slide.index;
-  //   });
-  // };
 
   /**
    * Simple function for removing a single slide or
@@ -175,7 +162,7 @@ export default class ImageSlider extends React.Component {
    */
   prevSlide = () => {
     const { infiniteMode } = this.props;
-    const { getActive, setActive, removeActive } = this;
+    const { getActive, setActive, removeActive, scrollToActive } = this;
     const { slides } = this.state;
     const active = getActive(slides);
     const activeSlideIndex = active[0] ? active[0].index : 0;
@@ -198,15 +185,20 @@ export default class ImageSlider extends React.Component {
       newActiveIndex = slides.length - 1;
     }
 
+    scrollToActive("nearest");
+
     // Since we are just moving a single slide just reset
     // all active
     removeActive(slides, activeSlideIndex, true);
 
     // Set the new active index
     setActive(slides, newActiveIndex);
-    const numOfSlides = 2;
+    const numOfSlidesToClone = 2;
 
-    if (infiniteMode && newActiveIndex === slides[numOfSlides - 1].index) {
+    if (
+      infiniteMode &&
+      newActiveIndex === slides[numOfSlidesToClone - 1].index
+    ) {
       const { slides } = this.state;
 
       const slidesToSlice = slides.slice(slides.length - 1);
@@ -228,14 +220,12 @@ export default class ImageSlider extends React.Component {
    */
   nextSlide = () => {
     const { infiniteMode } = this.props;
-    const { getActive, setActive, removeActive } = this;
+    const { getActive, setActive, removeActive, scrollToActive } = this;
     const { slides } = this.state;
     const active = getActive(slides);
-    // const x = getSlidesIndex(slides);
     const activeSlideIndex = active[active.length - 1]
       ? active[active.length - 1].index
       : slides.length - 1;
-
     // const newActiveIndex = Math.min(
     //   Math.max(activeSlideIndex + 1, 0),
     //   slides.length - 1
@@ -252,6 +242,8 @@ export default class ImageSlider extends React.Component {
       newActiveIndex = 0;
     }
 
+    scrollToActive("nearest");
+
     // Since we are just moving a single slide just reset
     // all active
     removeActive(slides, activeSlideIndex, true);
@@ -260,11 +252,11 @@ export default class ImageSlider extends React.Component {
     setActive(slides, newActiveIndex);
 
     // console.log(newActiveIndex);
-    const numOfSlides = 2;
+    const numOfSlidesToClone = 2;
 
     if (
       infiniteMode &&
-      newActiveIndex === slides[slides.length - numOfSlides].index
+      newActiveIndex === slides[slides.length - numOfSlidesToClone].index
     ) {
       const { slides } = this.state;
 
@@ -344,7 +336,7 @@ export default class ImageSlider extends React.Component {
     clearInterval(this.slidePlayInterval);
   };
 
-  scrollToActive = () => {
+  scrollToActive = (inline) => {
     const { getActive } = this;
     let { centerMode, slideToShow } = this.props;
     const { slides } = this.state;
@@ -382,7 +374,7 @@ export default class ImageSlider extends React.Component {
         currentSlide.scrollIntoView({
           behavior: "smooth",
           block: "center",
-          inline: "start"
+          inline: inline
         });
       }
     }
