@@ -346,10 +346,22 @@ export default class ImageSlider extends React.Component {
 
   scrollToActive = () => {
     const { getActive } = this;
-    const { centerMode, slidesToShow } = this.props;
+    let { centerMode, slideToShow } = this.props;
     const { slides } = this.state;
     const active = getActive(slides);
-    const odd = Number(slidesToShow) % 2 !== 0;
+    const odd = Number(slideToShow) % 2 !== 0;
+
+    // console.log("slideToShow", slideToShow);
+
+    // console.log("odd?", odd);
+
+    if (odd) {
+      centerMode = true;
+    } else {
+      centerMode = false;
+    }
+
+    // console.log("centerMode", centerMode);
 
     // Change this to another index if we need scroll 3 elements at once
     // with 3 element scroll then get the middle [ index 1 ] as the

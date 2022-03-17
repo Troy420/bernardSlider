@@ -1,8 +1,12 @@
 {
-  "name": "react-slider-v4",
+  "name": "bernardslider",
   "version": "1.0.0",
-  "description": "",
-  "keywords": [],
+  "description": "Carousel Slider in React JS",
+  "keywords": [
+    "reactjs",
+    "slider",
+    "carousel"
+  ],
   "main": "src/index.js",
   "dependencies": {
     "react": "17.0.2",
