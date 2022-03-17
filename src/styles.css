@@ -1,0 +1,128 @@
+@import "https://unpkg.com/open-props";
+@import "https://unpkg.com/open-props/normalize.min.css";
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+.slider {
+  --_spacer: var(--size-3);
+  /* position: relative; */
+  height: 90vh;
+  background: #04151f;
+  display: grid;
+  align-items: center;
+  /* grid-auto-flow: column; */
+  /* grid-auto-columns: 33.3%; */
+  /* gap: var(--_spacer); */
+  /* padding: 0 calc((23% * 0.3) / 2) var(--_spacer); */
+  /* overflow-x: auto; */
+  /* overscroll-behavior-inline: contain; */
+}
+.slide-wrapper {
+  --_spacer: var(--size-3);
+  /* position: relative; */
+  height: 70vh;
+  /* background: #333333; */
+  display: grid;
+  align-items: center;
+  grid-auto-flow: column;
+  grid-auto-columns: 25%;
+  gap: var(--_spacer);
+  /* padding: 0 var(--_spacer); */
+  padding: 0 30px;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  /* background: #85b79d; */
+  background-color: #c44900;
+}
+.slide {
+  --_spacer: var(--size-3);
+  opacity: 1;
+  padding: var(--_spacer);
+  background-color: #04151f;
+  border-radius: var(--radius-2);
+  display: grid;
+  gap: var(--_spacer);
+  grid-template-rows: min-content;
+  box-shadow: var(--shadow-5);
+  cursor: pointer;
+}
+.slide > img {
+  inline-size: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+}
+.slide.active {
+  opacity: 1;
+  transition-duration: 350ms;
+  transform: scale(1.1);
+  border: 3px solid #efd6ac;
+}
+.snaps-inline {
+  scroll-snap-type: x mandatory;
+  /**
+  scroll-padding-inline: var(--_spacer, 1rem);**/
+}
+.snaps-inline > * {
+  scroll-snap-align: center;
+}
+.snaps-inline > *:first-child {
+  scroll-snap-align: start;
+}
+.snaps-inline > *:last-child {
+  scroll-snap-align: end;
+}
+.btn-arrow {
+  --_spacer: var(--size-9);
+  font-size: var(--_spacer);
+  position: absolute;
+  top: 50%;
+  color: #efd6ac;
+  cursor: pointer;
+  user-select: none;
+  z-index: 99;
+  clip-path: circle();
+  padding: 0 10px;
+  background: transparent;
+}
+.right-arrow {
+  right: 0;
+}
+.left-arrow {
+  left: 0;
+}
+.slider-dots {
+  display: inline-flex;
+  height: 1.25em;
+  margin: 0;
+  position: absolute;
+  bottom: 1em;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: auto;
+}
+.slider-dots .active {
+  color: #c44900;
+  background-color: #c44900;
+  clip-path: circle();
+  padding: 5px;
+}
+.dot:hover {
+  color: #c44900;
+  background-color: #c44900;
+  clip-path: circle();
+  cursor: pointer;
+}
+.dot {
+  margin-right: 1rem;
+  font-size: 2em;
+  overflow: visible;
+}
+.btn {
+  padding: 20px;
+  background-color: #c44900;
+  color: #efd6ac;
+  margin-right: 10px;
+}
