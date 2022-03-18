@@ -20,7 +20,7 @@
   display: grid;
   align-items: center;
   grid-auto-flow: column;
-  grid-auto-columns: 25%;
+  /* grid-auto-columns: 25%; */
   gap: var(--_spacer);
   padding: 0 30px;
   overflow-x: auto;
@@ -35,12 +35,14 @@
   --_spacer: var(--size-3);
   /* opacity: 1; */
   padding: var(--_spacer);
-  background: linear-gradient(to top, #04151f 60%, transparent);
+  background: linear-gradient(to top, #04151f 40%, transparent);
   border-radius: var(--radius-2);
   display: grid;
   gap: var(--_spacer);
   grid-template-rows: min-content;
-  box-shadow: var(--shadow-6);
+  box-shadow: -1px 36px 34px -13px rgba(0, 0, 0, 0.57);
+  -webkit-box-shadow: -1px 36px 34px -13px rgba(0, 0, 0, 0.57);
+  -moz-box-shadow: -1px 36px 34px -13px rgba(0, 0, 0, 0.57);
   cursor: pointer;
 }
 .slide > img {

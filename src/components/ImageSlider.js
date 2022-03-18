@@ -16,11 +16,11 @@ export default class ImageSlider extends React.Component {
     slides: [],
     showLeft: true,
     showRight: true,
-    isScrolling: false
+    isScrolling: true
   };
 
   slidePlayInterval = -1;
-  sliderRef = createRef();
+  slideWrapperRef = createRef();
 
   constructor(props) {
     super(props);
@@ -48,6 +48,7 @@ export default class ImageSlider extends React.Component {
     this.scrollToActive();
     this.toggleButtons();
     this.slideToShow();
+    this.dragScroll();
 
     if (autoplay) {
       this.playSlide();
@@ -60,17 +61,48 @@ export default class ImageSlider extends React.Component {
     this.slideToShow();
   }
 
+  dragScroll() {
+    // When true, moving the mouse scrolls horizontally
+    let { isScrolling } = this.state;
+    let x = 0;
+    // dont know if we need y
+    let y = 0;
+
+    const slide_wrapper = this.slideWrapperRef.current;
+    // const context = myPics.getContext("2d");
+
+    // event.offsetX, event.offsetY gives the (x,y) offset from the edge of the canvas.
+
+    // Add the event listeners for mousedown, mousemove, and mouseup
+    const mouseDown = slide_wrapper.addEventListener("mousedown", (e) => {
+      console.log("mousedown");
+    });
+
+    slide_wrapper.addEventListener("mousemove", (e) => {
+      if (isScrolling === true) {
+        console.log("mousemove");
+        x = e.offsetX;
+        y = e.offsetY;
+        console.log("x", x);
+        console.log("y", y);
+      }
+    });
+
+    window.addEventListener("mouseup", (e) => {
+      if (isScrolling === true) {
+        console.log("mouseup");
+      }
+    });
+  }
+
   slideToShow() {
     // 100 / numberOfSlides + '%'
 
     const { slideToShow } = this.props;
     const numberOfSlide = Number(slideToShow);
-    // console.log(typeof Number(slideToShow));
-    // console.log(Number(slideToShow));
     const formula = Math.floor(100 / Number(numberOfSlide)) + "%";
-    // console.log(formula);
 
-    this.sliderRef.current.style.gridAutoColumns = formula;
+    this.slideWrapperRef.current.style.gridAutoColumns = formula;
   }
 
   /**
@@ -399,7 +431,7 @@ export default class ImageSlider extends React.Component {
               <FaAngleDoubleLeft />
             </button>
           )}
-          <div className="slide-wrapper" ref={this.sliderRef}>
+          <div className="slide-wrapper" ref={this.slideWrapperRef}>
             {slides.map((slide, index) => {
               return (
                 <div
@@ -419,17 +451,17 @@ export default class ImageSlider extends React.Component {
               <FaAngleDoubleRight />
             </button>
           )}
-        </div>
 
-        <SliderDots
-          key={JSON.stringify(
-            slides.map(({ ref, ...rest }) => {
-              return rest;
-            })
-          )}
-          slides={slides}
-          trigger={jumpToSlide}
-        />
+          <SliderDots
+            key={JSON.stringify(
+              slides.map(({ ref, ...rest }) => {
+                return rest;
+              })
+            )}
+            slides={slides}
+            trigger={jumpToSlide}
+          />
+        </div>
 
         <button className="btn btn-play" onClick={playSlide}>
           <FaPlay />
