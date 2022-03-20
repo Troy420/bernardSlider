@@ -15,8 +15,7 @@ export default class ImageSlider extends React.Component {
   state = {
     slides: [],
     showLeft: true,
-    showRight: true,
-    isScrolling: true
+    showRight: true
   };
 
   slidePlayInterval = -1;
@@ -62,36 +61,35 @@ export default class ImageSlider extends React.Component {
   }
 
   dragScroll() {
-    // When true, moving the mouse scrolls horizontally
-    let { isScrolling } = this.state;
-    let x = 0;
-    // dont know if we need y
-    let y = 0;
+    let isDown = false;
+    let startX;
+    let scrollLeft;
 
     const slide_wrapper = this.slideWrapperRef.current;
-    // const context = myPics.getContext("2d");
 
-    // event.offsetX, event.offsetY gives the (x,y) offset from the edge of the canvas.
+    // Add the event listeners for mousedown, mouseleave, mousemove, and mouseup
+    slide_wrapper.addEventListener("mousedown", (e) => {
+      isDown = true;
+      startX = e.pageX - slide_wrapper.offsetLeft;
+      scrollLeft = slide_wrapper.scrollLeft;
+    });
 
-    // Add the event listeners for mousedown, mousemove, and mouseup
-    const mouseDown = slide_wrapper.addEventListener("mousedown", (e) => {
-      console.log("mousedown");
+    slide_wrapper.addEventListener("mouseleave", () => {
+      isDown = false;
+    });
+    slide_wrapper.addEventListener("mouseup", () => {
+      isDown = false;
     });
 
     slide_wrapper.addEventListener("mousemove", (e) => {
-      if (isScrolling === true) {
-        console.log("mousemove");
-        x = e.offsetX;
-        y = e.offsetY;
-        console.log("x", x);
-        console.log("y", y);
-      }
-    });
-
-    window.addEventListener("mouseup", (e) => {
-      if (isScrolling === true) {
-        console.log("mouseup");
-      }
+      if (!isDown) return;
+      e.preventDefault();
+      const x = e.pageX - slide_wrapper.offsetLeft;
+      // console.log(x);
+      const walk = (x - startX) * 3; //scroll-fast
+      // console.log(startX);
+      slide_wrapper.scrollLeft = scrollLeft - walk;
+      // console.log(walk);
     });
   }
 

@@ -35,7 +35,7 @@
   --_spacer: var(--size-3);
   /* opacity: 1; */
   padding: var(--_spacer);
-  background: linear-gradient(to top, #04151f 40%, transparent);
+  background: linear-gradient(to top, #04151f 50%, rgba(4, 21, 31, 0.3));
   border-radius: var(--radius-2);
   display: grid;
   gap: var(--_spacer);
