@@ -16,9 +16,9 @@ export default class App extends React.Component {
           slides={SliderData}
           slideInterval="1000"
           autoplay={false}
-          slideToShow="4"
           infiniteMode={true}
-          centerMode
+          // slideToShow
+          // centerMode
         />
       </>
     );

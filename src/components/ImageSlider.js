@@ -1,5 +1,4 @@
 import React, { createRef } from "react";
-// import { FaSlidersH } from "react-icons/fa";
 import {
   FaAngleDoubleRight,
   FaAngleDoubleLeft,
@@ -15,7 +14,9 @@ export default class ImageSlider extends React.Component {
   state = {
     slides: [],
     showLeft: true,
-    showRight: true
+    showRight: true,
+    slideToShow: 3,
+    centerMode: true
   };
 
   slidePlayInterval = -1;
@@ -25,8 +26,7 @@ export default class ImageSlider extends React.Component {
     super(props);
 
     // Allow user to inject different kind of props for initial state
-    const { active, slides = [] } = props;
-
+    const { active, slides = [], centerMode = true, slideToShow = 3 } = props;
     // Mutate the slides to add our internal variables
     // Currently we only need active and index
     // but when you do dot jump, you might need other variables such as is clone or group etc
@@ -39,6 +39,8 @@ export default class ImageSlider extends React.Component {
 
     // Inject the modified slides to state
     this.state.slides = slides;
+    this.state.centerMode = centerMode;
+    this.state.slideToShow = slideToShow;
   }
 
   componentDidMount() {
@@ -46,7 +48,6 @@ export default class ImageSlider extends React.Component {
 
     this.scrollToActive();
     this.toggleButtons();
-    this.slideToShow();
     this.dragScroll();
 
     if (autoplay) {
@@ -57,10 +58,10 @@ export default class ImageSlider extends React.Component {
   componentDidUpdate() {
     this.scrollToActive();
     this.toggleButtons();
-    this.slideToShow();
   }
 
   dragScroll() {
+    // Use this.isDown or use state
     let isDown = false;
     let startX;
     let scrollLeft;
@@ -70,38 +71,63 @@ export default class ImageSlider extends React.Component {
     // Add the event listeners for mousedown, mouseleave, mousemove, and mouseup
     slide_wrapper.addEventListener("mousedown", (e) => {
       isDown = true;
+      slide_wrapper.classList.add("grabbing");
       startX = e.pageX - slide_wrapper.offsetLeft;
       scrollLeft = slide_wrapper.scrollLeft;
     });
 
     slide_wrapper.addEventListener("mouseleave", () => {
       isDown = false;
+      slide_wrapper.classList.remove("grabbing");
     });
     slide_wrapper.addEventListener("mouseup", () => {
       isDown = false;
+      slide_wrapper.classList.remove("grabbing");
     });
 
     slide_wrapper.addEventListener("mousemove", (e) => {
       if (!isDown) return;
       e.preventDefault();
+
+      // The concept isnt right, we should move the slide one by one
+      // left = slide - 1 , right = slide + 1
+      // then scroll it
+      // thus it will emulate the button left / right clicking when
+      // user dragging
+
+      if (startX < scrollLeft) {
+        this.nextSlide();
+      } else {
+        this.prevSlide();
+      }
+
+      /**
       const x = e.pageX - slide_wrapper.offsetLeft;
       // console.log(x);
       const walk = (x - startX) * 3; //scroll-fast
       // console.log(startX);
       slide_wrapper.scrollLeft = scrollLeft - walk;
       // console.log(walk);
+      **/
     });
   }
 
-  slideToShow() {
-    // 100 / numberOfSlides + '%'
+  setSlideShow = (numberOfColumns) => {
+    const stylesheet = document.styleSheets[0];
+    const formula = Math.floor(100 / parseInt(numberOfColumns, 10)) + "%";
 
-    const { slideToShow } = this.props;
-    const numberOfSlide = Number(slideToShow);
-    const formula = Math.floor(100 / Number(numberOfSlide)) + "%";
+    // console.log(this.slideWrapperRef.current);
+    // console.log(document.styleSheets[0]);
+    let gridRule;
 
-    this.slideWrapperRef.current.style.gridAutoColumns = formula;
-  }
+    for (let i = 0; i < stylesheet.cssRules.length; i++) {
+      if (stylesheet.cssRules[i].selectorText === ".slide-wrapper") {
+        gridRule = stylesheet.cssRules[i];
+        // console.log(gridRule);
+        gridRule.style.setProperty("grid-auto-columns", formula);
+      }
+    }
+  };
 
   /**
    * Simple function for getting all the active slides
@@ -367,39 +393,27 @@ export default class ImageSlider extends React.Component {
 
   scrollToActive = (inline) => {
     const { getActive } = this;
-    let { centerMode, slideToShow } = this.props;
-    const { slides } = this.state;
+    const { slides, centerMode, slideToShow } = this.state;
     const active = getActive(slides);
-    const odd = Number(slideToShow) % 2 !== 0;
-
-    if (odd) {
-      centerMode = true;
-    } else {
-      centerMode = false;
-    }
+    const odd = parseInt(slideToShow, 10) % 2 !== 0;
+    const options =
+      odd && centerMode
+        ? {
+            behavior: "smooth",
+            block: "center",
+            inline: "center"
+          }
+        : {
+            behavior: "smooth",
+            block: "center",
+            inline: inline
+          };
 
     // Change this to another index if we need scroll 3 elements at once
     // with 3 element scroll then get the middle [ index 1 ] as the
     // target scrolling
-    const currentSlide =
-      active[0] && active[0].ref && active[0].ref.current
-        ? active[0].ref.current
-        : false;
-
-    if (currentSlide) {
-      if (odd && centerMode) {
-        currentSlide.scrollIntoView({
-          behavior: "smooth",
-          block: "center",
-          inline: "center"
-        });
-      } else {
-        currentSlide.scrollIntoView({
-          behavior: "smooth",
-          block: "center",
-          inline: inline
-        });
-      }
+    if (active[0] && active[0].ref && active[0].ref.current) {
+      active[0].ref.current.scrollIntoView(options);
     }
   };
 
@@ -413,7 +427,8 @@ export default class ImageSlider extends React.Component {
       currentSlide,
       jumpToSlide,
       playSlide,
-      stopSlide
+      stopSlide,
+      setSlideShow
     } = this;
     const { slides, showLeft, showRight } = this.state;
 
@@ -460,13 +475,46 @@ export default class ImageSlider extends React.Component {
             trigger={jumpToSlide}
           />
         </div>
+        <div className="btn-wrapper">
+          <button className="btn btn-play" onClick={playSlide}>
+            <FaPlay />
+          </button>
+          <button className="btn btn-stop" onClick={stopSlide}>
+            <FaSquare />
+          </button>
 
-        <button className="btn btn-play" onClick={playSlide}>
-          <FaPlay />
-        </button>
-        <button className="btn btn-stop" onClick={stopSlide}>
-          <FaSquare />
-        </button>
+          {/* COLUMNS */}
+          <button
+            className="btn btn-column-1"
+            onClick={() => setSlideShow("1")}
+          >
+            1 Column
+          </button>
+          <button
+            className="btn btn-column-2"
+            onClick={() => setSlideShow("2")}
+          >
+            2 Columns
+          </button>
+          <button
+            className="btn btn-column-3"
+            onClick={() => setSlideShow("3")}
+          >
+            3 Columns
+          </button>
+          <button
+            className="btn btn-column-4"
+            onClick={() => setSlideShow("4")}
+          >
+            4 Columns
+          </button>
+          <button
+            className="btn btn-column-5"
+            onClick={() => setSlideShow("5")}
+          >
+            5 Columns
+          </button>
+        </div>
       </>
     );
   }
