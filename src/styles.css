@@ -1,6 +1,10 @@
 @import "https://unpkg.com/open-props";
 @import "https://unpkg.com/open-props/normalize.min.css";
 
+/* :root {
+  grid-auto-columns: var(--columns);
+} */
+
 * {
   box-sizing: border-box;
   padding: 0;
@@ -27,7 +31,7 @@
   background-color: #c44900;
   scrollbar-width: none;
   transform: scale(0.98);
-  grid-auto-columns: 100%;
+  grid-auto-columns: 33%;
 }
 .slide-wrapper::-webkit-scrollbar {
   display: none;
@@ -122,4 +126,19 @@
 }
 .btn:focus {
   background-color: #04151f;
+}
+.column-1 {
+  grid-auto-columns: 100%;
+}
+.column-2 {
+  grid-auto-columns: 50%;
+}
+.column-3 {
+  grid-auto-columns: 33%;
+}
+.column-4 {
+  grid-auto-columns: 25%;
+}
+.column-5 {
+  grid-auto-columns: 20%;
 }

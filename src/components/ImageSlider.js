@@ -15,8 +15,12 @@ export default class ImageSlider extends React.Component {
     slides: [],
     showLeft: true,
     showRight: true,
-    slideToShow: 3,
-    centerMode: true
+    slideToShow: 0,
+    centerMode: true,
+    active: 0,
+    infiniteMode: true,
+    slideInterval: 1000,
+    autoplay: true
   };
 
   slidePlayInterval = -1;
@@ -26,7 +30,16 @@ export default class ImageSlider extends React.Component {
     super(props);
 
     // Allow user to inject different kind of props for initial state
-    const { active, slides = [], centerMode = true, slideToShow = 3 } = props;
+    const {
+      active = 4,
+      slides = [],
+      centerMode = true,
+      slideToShow = 5,
+      infiniteMode = true,
+      slideInterval = 1000,
+      autoplay = true
+    } = props;
+    // const { active, slides = [] } = props;
     // Mutate the slides to add our internal variables
     // Currently we only need active and index
     // but when you do dot jump, you might need other variables such as is clone or group etc
@@ -41,10 +54,14 @@ export default class ImageSlider extends React.Component {
     this.state.slides = slides;
     this.state.centerMode = centerMode;
     this.state.slideToShow = slideToShow;
+    this.state.active = active;
+    this.state.infiniteMode = infiniteMode;
+    this.state.autoplay = autoplay;
+    this.state.slideInterval = slideInterval;
   }
 
   componentDidMount() {
-    const { autoplay } = this.props;
+    const { autoplay } = this.state;
 
     this.scrollToActive();
     this.toggleButtons();
@@ -113,15 +130,33 @@ export default class ImageSlider extends React.Component {
   }
 
   setSlideShow = (numberOfColumns) => {
+    /**
+     * The returned list (CSSStyleRule constructor) is ordered as follows:
+
+    StyleSheets retrieved from <link> headers are placed first, sorted in header order.
+    StyleSheets retrieved from the DOM are placed after, sorted in tree order.
+
+     */
     const stylesheet = document.styleSheets[0];
     const formula = Math.floor(100 / parseInt(numberOfColumns, 10)) + "%";
+    const odd = parseInt(numberOfColumns, 10) % 2 !== 0;
 
+    // const newStates = {
+    //   slideToShow: 3,
+    //   centerMode: true
+    // };
+
+    console.log(odd);
+    console.log(formula);
+
+    // console.log(this.slideWrapperRef.current.classList.add("column-1"));
     // console.log(this.slideWrapperRef.current);
-    // console.log(document.styleSheets[0]);
     let gridRule;
-
     for (let i = 0; i < stylesheet.cssRules.length; i++) {
       if (stylesheet.cssRules[i].selectorText === ".slide-wrapper") {
+        /**
+         * The returned list (cssRules array)
+         */
         gridRule = stylesheet.cssRules[i];
         // console.log(gridRule);
         gridRule.style.setProperty("grid-auto-columns", formula);
@@ -186,8 +221,8 @@ export default class ImageSlider extends React.Component {
 
   toggleButtons = () => {
     const { getActive } = this;
-    const { infiniteMode } = this.props;
-    const { slides, showLeft, showRight } = this.state;
+    // const { infiniteMode } = this.props;
+    const { slides, showLeft, showRight, infiniteMode } = this.state;
     const actives = getActive(slides);
     const first = actives.slice(0, 1).pop();
     const last = actives.slice(-1).pop();
@@ -216,9 +251,9 @@ export default class ImageSlider extends React.Component {
    *
    */
   prevSlide = () => {
-    const { infiniteMode } = this.props;
+    // const { infiniteMode } = this.props;
     const { getActive, setActive, removeActive, scrollToActive } = this;
-    const { slides } = this.state;
+    const { slides, infiniteMode } = this.state;
     const active = getActive(slides);
     const activeSlideIndex = active[0] ? active[0].index : 0;
 
@@ -274,9 +309,10 @@ export default class ImageSlider extends React.Component {
    *
    */
   nextSlide = () => {
-    const { infiniteMode } = this.props;
+    // const { infiniteMode } = this.props;
     const { getActive, setActive, removeActive, scrollToActive } = this;
-    const { slides } = this.state;
+    const { slides, infiniteMode } = this.state;
+
     const active = getActive(slides);
     const activeSlideIndex = active[active.length - 1]
       ? active[active.length - 1].index
@@ -373,8 +409,8 @@ export default class ImageSlider extends React.Component {
   };
 
   playSlide = () => {
-    const { slideInterval } = this.props;
-    const { slides } = this.state;
+    // const { slideInterval } = this.props;
+    const { slides, slideInterval } = this.state;
     const { nextSlide } = this;
     // const active = getActive(slides);
 
@@ -393,11 +429,24 @@ export default class ImageSlider extends React.Component {
 
   scrollToActive = (inline) => {
     const { getActive } = this;
-    const { slides, centerMode, slideToShow } = this.state;
+    const { slides, slideToShow } = this.state;
+    // console.log("centerMode", centerMode);
+    // console.log(`slideToShow: ${slideToShow}`);
     const active = getActive(slides);
     const odd = parseInt(slideToShow, 10) % 2 !== 0;
+
+    console.log(slideToShow);
+
+    const newStates = {
+      centerMode: false
+    };
+
+    if (slideToShow === odd) {
+      newStates.centerMode = true;
+    }
+
     const options =
-      odd && centerMode
+      odd && newStates.centerMode
         ? {
             behavior: "smooth",
             block: "center",
@@ -414,6 +463,7 @@ export default class ImageSlider extends React.Component {
     // target scrolling
     if (active[0] && active[0].ref && active[0].ref.current) {
       active[0].ref.current.scrollIntoView(options);
+      console.log(options);
     }
   };
 
