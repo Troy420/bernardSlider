@@ -20,7 +20,9 @@ export default class ImageSlider extends React.Component {
     active: 0,
     infiniteMode: true,
     slideInterval: 1000,
-    autoplay: true
+    autoplay: true,
+    view: "grid",
+    isMobile: true
   };
 
   slidePlayInterval = -1;
@@ -31,13 +33,15 @@ export default class ImageSlider extends React.Component {
 
     // Allow user to inject different kind of props for initial state
     const {
-      active = 4,
+      active = 0,
       slides = [],
-      centerMode = true,
-      slideToShow = 5,
+      centerMode = false,
+      slideToShow = 3,
       infiniteMode = true,
       slideInterval = 1000,
-      autoplay = true
+      autoplay = false,
+      view = "grid",
+      isMobile = true
     } = props;
     // const { active, slides = [] } = props;
     // Mutate the slides to add our internal variables
@@ -51,13 +55,25 @@ export default class ImageSlider extends React.Component {
     });
 
     // Inject the modified slides to state
-    this.state.slides = slides;
-    this.state.centerMode = centerMode;
-    this.state.slideToShow = slideToShow;
-    this.state.active = active;
-    this.state.infiniteMode = infiniteMode;
-    this.state.autoplay = autoplay;
-    this.state.slideInterval = slideInterval;
+    // this.state.slides = slides;
+    // this.state.centerMode = centerMode;
+    // this.state.slideToShow = slideToShow;
+    // this.state.active = active;
+    // this.state.infiniteMode = infiniteMode;
+    // this.state.autoplay = autoplay;
+    // this.state.slideInterval = slideInterval;
+
+    this.state = {
+      slides: slides,
+      centerMode: centerMode,
+      slideToShow: slideToShow,
+      active: active,
+      infiniteMode: infiniteMode,
+      autoplay: autoplay,
+      slideInterval: slideInterval,
+      view: view,
+      isMobile: isMobile
+    };
   }
 
   componentDidMount() {
@@ -118,50 +134,58 @@ export default class ImageSlider extends React.Component {
         this.prevSlide();
       }
 
-      /**
+      /** 
       const x = e.pageX - slide_wrapper.offsetLeft;
       // console.log(x);
       const walk = (x - startX) * 3; //scroll-fast
       // console.log(startX);
       slide_wrapper.scrollLeft = scrollLeft - walk;
       // console.log(walk);
-      **/
+      */
+
+      console.log("scroll left", scrollLeft);
+      console.log("startX", startX);
     });
   }
 
+  handleChangeView = (view) => {
+    this.setState({
+      view: view
+    });
+  };
+
   setSlideShow = (numberOfColumns) => {
-    /**
-     * The returned list (CSSStyleRule constructor) is ordered as follows:
+    // let formula = Math.floor(100 / parseInt(numberOfColumns, 10)) + "%";
 
-    StyleSheets retrieved from <link> headers are placed first, sorted in header order.
-    StyleSheets retrieved from the DOM are placed after, sorted in tree order.
+    const { view, isMobile } = this.state;
+    const slide_wrapper = this.slideWrapperRef.current;
 
-     */
-    const stylesheet = document.styleSheets[0];
-    const formula = Math.floor(100 / parseInt(numberOfColumns, 10)) + "%";
-    const odd = parseInt(numberOfColumns, 10) % 2 !== 0;
+    // console.log(`view: ${view}`);
+    // console.log(`isMobile: ${isMobile}`);
 
-    // const newStates = {
-    //   slideToShow: 3,
-    //   centerMode: true
-    // };
+    const classes = [
+      "column-1",
+      "column-2",
+      "column-3",
+      "column-4",
+      "column-5"
+    ];
 
-    console.log(odd);
-    console.log(formula);
+    // isMobile ? classes.push(view + "-column-1") : "column-1";
+    slide_wrapper.classList.remove(...classes);
+    slide_wrapper.classList.add("column-" + numberOfColumns);
 
-    // console.log(this.slideWrapperRef.current.classList.add("column-1"));
-    // console.log(this.slideWrapperRef.current);
-    let gridRule;
-    for (let i = 0; i < stylesheet.cssRules.length; i++) {
-      if (stylesheet.cssRules[i].selectorText === ".slide-wrapper") {
-        /**
-         * The returned list (cssRules array)
-         */
-        gridRule = stylesheet.cssRules[i];
-        // console.log(gridRule);
-        gridRule.style.setProperty("grid-auto-columns", formula);
-      }
-    }
+    // let gridRule;
+    // for (let i = 0; i < stylesheet.cssRules.length; i++) {
+    //   if (stylesheet.cssRules[i].selectorText === ".slide-wrapper") {
+    //     /**
+    //      * The returned list (cssRules array)
+    //      */
+    //     gridRule = stylesheet.cssRules[i];
+    //     // console.log(gridRule);
+    //     gridRule.style.setProperty("grid-auto-columns", formula);
+    //   }
+    // }
   };
 
   /**
@@ -430,23 +454,18 @@ export default class ImageSlider extends React.Component {
   scrollToActive = (inline) => {
     const { getActive } = this;
     const { slides, slideToShow } = this.state;
+    let { centerMode } = this.state;
     // console.log("centerMode", centerMode);
     // console.log(`slideToShow: ${slideToShow}`);
     const active = getActive(slides);
     const odd = parseInt(slideToShow, 10) % 2 !== 0;
 
-    console.log(slideToShow);
-
-    const newStates = {
-      centerMode: false
-    };
-
     if (slideToShow === odd) {
-      newStates.centerMode = true;
+      centerMode = true;
     }
 
     const options =
-      odd && newStates.centerMode
+      odd && centerMode
         ? {
             behavior: "smooth",
             block: "center",
@@ -463,7 +482,7 @@ export default class ImageSlider extends React.Component {
     // target scrolling
     if (active[0] && active[0].ref && active[0].ref.current) {
       active[0].ref.current.scrollIntoView(options);
-      console.log(options);
+      // console.log(options);
     }
   };
 
